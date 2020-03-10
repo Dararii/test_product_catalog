@@ -31,11 +31,14 @@ class CatalogRepositoryImpl implements CatalogRepository {
 
   Future<Either<Failure, Product>> _getProductById(String productId) async {
     if (await networkInfo.isConnected) {
+      if (productId.contains("@"))
+        return Left(InvalidProductIdFailure());
+
       try {
         Product p = await remoteDataSource.getProductById(productId);
         return Right(p);
       } on ServerException {
-        return Left(ServerFailure());
+        return Left(InvalidBearerTokenFailure());
       }
     } else
       return Left(ServerFailure());
@@ -44,12 +47,15 @@ class CatalogRepositoryImpl implements CatalogRepository {
   Future<Either<Failure, List<Product>>> _getProducts(
       String name, String category, SortBy sortBy) async {
     if (await networkInfo.isConnected) {
+      if (category.contains("@"))
+        return Left(InvalidCategoryIdFailure());
+
       try {
         ProductListModel p =
-            await remoteDataSource.getProducts(name, category, sortBy);
+        await remoteDataSource.getProducts(name, category, sortBy);
         return Right(p.products);
       } on ServerException {
-        return Left(ServerFailure());
+        return Left(InvalidBearerTokenFailure());
       }
     } else
       return Left(ServerFailure());

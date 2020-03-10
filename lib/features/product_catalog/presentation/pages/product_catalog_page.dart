@@ -20,15 +20,16 @@ class ProductCatalogPage extends StatefulWidget {
 
 class _ProductCatalogPageState extends State<ProductCatalogPage> {
   String status = "Status Text";
+  String id = '';
   List<Product> products = List();
 
-  void getProducts() async {
+  void getProducts(String cat) async {
     var result = await GetProducts(
       CatalogRepositoryImpl(
         remoteDataSource: GetProductRemoteDataSourceImpl(),
         networkInfo: NetworkInfoImpl(DataConnectionChecker()),
       ),
-    ).execute(name: "Sampo", categoryId: "1", sortBy: SortBy.nameAsc);
+    ).execute(name: "Sampo", categoryId: cat, sortBy: SortBy.nameAsc);
 
     result.fold(
       (exception) {
@@ -44,13 +45,13 @@ class _ProductCatalogPageState extends State<ProductCatalogPage> {
     );
   }
 
-  void getProductsById() async {
+  void getProductsById(String id) async {
     var result = await GetProductById(
       CatalogRepositoryImpl(
         remoteDataSource: GetProductRemoteDataSourceImpl(),
         networkInfo: NetworkInfoImpl(DataConnectionChecker()),
       ),
-    ).execute(productId: "Id");
+    ).execute(productId: id);
 
     result.fold(
       (exception) {
@@ -100,20 +101,26 @@ class _ProductCatalogPageState extends State<ProductCatalogPage> {
               textAlign: TextAlign.center,
             ),
             TextField(
-              decoration: InputDecoration(hintText: "Search Product by Id"),
+              decoration: InputDecoration(
+                  hintText: "Search Product - Input @ to Fail"),
+              onChanged: (v) {
+                setState(() {
+                  id = v;
+                });
+              },
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 FlatButton(
                   onPressed: () {
-                    getProductsById();
+                    getProductsById(id);
                   },
                   child: Text("Search"),
                 ),
                 FlatButton(
                   onPressed: () {
-                    getProducts();
+                    getProducts(id);
                   },
                   child: Text("Get Product List"),
                 )
