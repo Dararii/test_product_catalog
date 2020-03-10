@@ -6,6 +6,7 @@ part 'number_trivia_model.g.dart';
 
 @JsonSerializable(nullable: true, explicitToJson: true, anyMap: true)
 class NumberTriviaModel extends NumberTrivia {
+
   NumberTriviaModel({
     @required String text,
     @required int number,
